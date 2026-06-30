@@ -1,0 +1,14 @@
+.git
+.gcloud
+.env
+env.yaml
+env_setup.bat
+*.db
+*.db-journal
+data/
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+venv/
+.venv/

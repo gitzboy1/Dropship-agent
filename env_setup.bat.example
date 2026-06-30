@@ -1,0 +1,31 @@
+@echo off
+REM ============================================================
+REM  DropShip AI Agent — Environment Variable Setup
+REM  Run: env_setup.bat
+REM  Then: python setup_db.py
+REM        python app.py
+REM ============================================================
+
+REM ── AlloyDB ─────────────────────────────────────────────────
+set ALLOYDB_HOST=YOUR_ALLOYDB_IP
+set ALLOYDB_PASSWORD=YOUR_POSTGRES_PASSWORD
+set ALLOYDB_PORT=5432
+set ALLOYDB_DATABASE=dropship_db
+set ALLOYDB_USER=postgres
+
+REM ── Telegram ────────────────────────────────────────────────
+set TELEGRAM_ENABLED=false
+set TELEGRAM_TOKEN=YOUR_TELEGRAM_BOT_TOKEN
+set TELEGRAM_CHAT_ID=YOUR_TELEGRAM_CHAT_ID
+
+REM ── Google Cloud ────────────────────────────────────────────
+set GOOGLE_CLOUD_PROJECT=YOUR_GOOGLE_CLOUD_PROJECT_ID
+set GOOGLE_CLOUD_REGION=asia-south2
+set GEMINI_API_KEY=YOUR_GEMINI_API_KEY
+
+echo Environment variables set!
+echo.
+echo Next steps:
+echo   1. Edit ALLOYDB_HOST and ALLOYDB_PASSWORD above
+echo   2. Run: python setup_db.py   (creates the database)
+echo   3. Run: python app.py        (starts the server)

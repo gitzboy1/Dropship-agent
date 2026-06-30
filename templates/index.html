@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DropShip AI Mission Control</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"></script>
+    <link rel="stylesheet" href="/static/app.css">
+</head>
+<body>
+    <div class="ambient ambient-a"></div>
+    <div class="ambient ambient-b"></div>
+    <div class="shell">
+        <header class="topbar">
+            <div class="brand-lockup">
+                <div class="brand-mark">DA</div>
+                <div>
+                    <p class="eyebrow">Dark Ops Stack</p>
+                    <h1>DropShip AI Mission Control</h1>
+                </div>
+            </div>
+            <div class="topbar-status">
+                <div class="status-pill" id="workspaceChip">Guest Workspace</div>
+                <div class="status-pill" id="currentAgent">General Agent</div>
+                <div class="status-pill live-pill" id="dbBadge">Loading</div>
+            </div>
+        </header>
+
+        <div class="app-layout">
+            <aside class="left-rail">
+                <section class="panel auth-panel">
+                    <div class="panel-head">
+                        <div>
+                            <p class="panel-kicker">Account</p>
+                            <h2 id="authStatus">Local guest mode</h2>
+                        </div>
+                    </div>
+                    <div class="auth-form">
+                        <input class="field" id="authName" placeholder="Full name">
+                        <input class="field" id="authEmail" placeholder="Email">
+                        <input class="field" id="authPassword" type="password" placeholder="Password">
+                    </div>
+                    <div class="split-actions">
+                        <button class="ghost-btn" onclick="registerAccount()">Register</button>
+                        <button class="ghost-btn" onclick="loginAccount()">Login</button>
+                    </div>
+                    <div class="split-actions">
+                        <button class="ghost-btn" onclick="logoutAccount()">Logout</button>
+                        <button class="ghost-btn" onclick="createWorkspaceLocal()">New Workspace</button>
+                    </div>
+                    <p class="panel-note" id="workspaceMeta">Sign in to unlock saved workspaces, audit trails, and task tracking.</p>
+                </section>
+
+                <section class="panel budget-panel">
+                    <div class="panel-head">
+                        <div>
+                            <p class="panel-kicker">Capital Control</p>
+                            <h2 id="budgetNum">Rs 0</h2>
+                        </div>
+                        <div class="mini-stat">
+                            <span>Spent</span>
+                            <strong id="spentNum">Rs 0</strong>
+                        </div>
+                    </div>
+                    <div class="budget-track">
+                        <div class="budget-fill" id="budgetFill"></div>
+                    </div>
+                    <div class="budget-input-row">
+                        <input class="field" id="budgetInput" type="number" placeholder="Set operating budget">
+                        <button class="primary-btn" onclick="setBudget()">Save</button>
+                    </div>
+                    <div class="mode-stack">
+                        <button class="mode-btn active" id="btn-confirm" onclick="setApproval('confirm')">Confirm each action</button>
+                        <button class="mode-btn" id="btn-view" onclick="setApproval('view')">View only mode</button>
+                        <button class="mode-btn" id="btn-auto" onclick="setApproval('auto')">Full auto inside budget</button>
+                    </div>
+                </section>
+
+                <section class="panel workflow-panel">
+                    <div class="panel-head">
+                        <div>
+                            <p class="panel-kicker">Workflow Launchers</p>
+                            <h2>Start an operation</h2>
+                        </div>
+                    </div>
+                    <div class="workflow-list">
+                        <button class="workflow-btn" onclick="sendQuick('What are the trending products in Delhi right now?')">Market scan</button>
+                        <button class="workflow-btn" onclick="sendQuick('Find best suppliers for bluetooth earbuds')">Supplier sweep</button>
+                        <button class="workflow-btn" onclick="sendQuick('Calculate profit for cost 250 selling 799 units 30')">Margin check</button>
+                        <button class="workflow-btn" onclick="sendQuick('Give me a complete beginner dropshipping roadmap')">Launch plan</button>
+                        <button class="workflow-btn" onclick="quickTask('Validate top 3 products', 'research', 'trend')">Create research task</button>
+                        <button class="workflow-btn" onclick="quickTask('Prepare launch checklist', 'execution', 'general')">Create launch task</button>
+                    </div>
+                </section>
+            </aside>
+
+            <main class="main-stage">
+                <section class="hero-strip">
+                    <div>
+                        <p class="eyebrow">Operator Console</p>
+                        <h2>Looks like a command deck. Behaves like a workbench.</h2>
+                        <p class="hero-copy">Research products, queue tasks, track business state, and steer the assistant like an operator instead of chatting into a blank box.</p>
+                    </div>
+                    <div class="hero-actions">
+                        <button class="primary-btn" onclick="sendQuick('Show trending products in USA')">Scan USA</button>
+                        <button class="ghost-btn" onclick="quickTask('Review current task queue', 'ops', 'general')">Queue ops review</button>
+                    </div>
+                </section>
+
+                <section class="metrics-grid">
+                    <article class="metric-card">
+                        <span class="metric-label">Products tracked</span>
+                        <strong class="metric-value" id="productsFound">0</strong>
+                    </article>
+                    <article class="metric-card">
+                        <span class="metric-label">Actions logged</span>
+                        <strong class="metric-value" id="actionsCount">0</strong>
+                    </article>
+                    <article class="metric-card">
+                        <span class="metric-label">Tasks queued</span>
+                        <strong class="metric-value" id="tasksCount">0</strong>
+                    </article>
+                    <article class="metric-card">
+                        <span class="metric-label">Usage events</span>
+                        <strong class="metric-value" id="usageCount">0</strong>
+                    </article>
+                </section>
+
+                <nav class="tab-bar">
+                    <button class="tab-btn active" data-tab="chat">Command Deck</button>
+                    <button class="tab-btn" data-tab="analytics">Analytics</button>
+                    <button class="tab-btn" data-tab="tasks">Task Board</button>
+                    <button class="tab-btn" data-tab="history">Audit Trail</button>
+                </nav>
+
+                <section class="tab-panel active" id="tab-chat">
+                    <div class="chat-layout">
+                        <section class="panel command-panel">
+                            <div class="panel-head">
+                                <div>
+                                    <p class="panel-kicker">Assistant Console</p>
+                                    <h2>Command Deck</h2>
+                                </div>
+                            </div>
+                            <div class="chip-row">
+                                <button class="chip" onclick="sendQuick('What products are trending in Mumbai?')">Mumbai trends</button>
+                                <button class="chip" onclick="sendQuick('Compare AliExpress vs CJ Dropshipping vs Zendrop')">Compare suppliers</button>
+                                <button class="chip" onclick="sendQuick('Research and analyze air purifier product in depth')">Deep research</button>
+                                <button class="chip" onclick="sendQuick('Help me choose a niche for India with a low budget')">Niche finder</button>
+                            </div>
+                            <div class="chat-feed" id="chatContainer">
+                                <div class="welcome-card">
+                                    <p class="eyebrow">Ready to Operate</p>
+                                    <h3>Use this like mission control, not just a chat box.</h3>
+                                    <p>Launch market scans, create tasks, inspect the queue, and keep a living workspace state while the assistant works with you.</p>
+                                </div>
+                            </div>
+                            <div class="composer">
+                                <input class="composer-input" id="msgInput" placeholder="Issue a command, ask for a plan, or queue a workflow..." onkeydown="if(event.key==='Enter')sendMessage()">
+                                <button class="primary-btn" onclick="sendMessage()">Run</button>
+                            </div>
+                        </section>
+
+                        <div class="side-stack">
+                            <section class="panel">
+                                <div class="panel-head">
+                                    <div>
+                                        <p class="panel-kicker">Live Queue</p>
+                                        <h2>Task Signals</h2>
+                                    </div>
+                                </div>
+                                <div class="queue-summary" id="queueSummary">
+                                    <div class="empty-state">Sign in to start building a real queue.</div>
+                                </div>
+                            </section>
+                            <section class="panel">
+                                <div class="panel-head">
+                                    <div>
+                                        <p class="panel-kicker">Product Radar</p>
+                                        <h2>Current shortlist</h2>
+                                    </div>
+                                </div>
+                                <div class="products-grid" id="productsGrid">
+                                    <div class="empty-state">No product radar yet. Run a market scan.</div>
+                                </div>
+                            </section>
+                            <section class="panel">
+                                <div class="panel-head">
+                                    <div>
+                                        <p class="panel-kicker">Execution Log</p>
+                                        <h2>Latest actions</h2>
+                                    </div>
+                                </div>
+                                <div class="action-log" id="actionLog">
+                                    <div class="empty-state">No actions recorded yet.</div>
+                                </div>
+                            </section>
+                        </div>
+                    </div>
+                </section>
+
+                <section class="tab-panel" id="tab-analytics">
+                    <div class="analytics-grid">
+                        <section class="panel">
+                            <div class="panel-head">
+                                <div>
+                                    <p class="panel-kicker">Margin Lens</p>
+                                    <h2>Profit window</h2>
+                                </div>
+                            </div>
+                            <canvas id="profitChart"></canvas>
+                        </section>
+                        <section class="panel">
+                            <div class="panel-head">
+                                <div>
+                                    <p class="panel-kicker">Budget Split</p>
+                                    <h2>Capital allocation</h2>
+                                </div>
+                            </div>
+                            <canvas id="budgetChart"></canvas>
+                        </section>
+                        <section class="panel panel-span">
+                            <div class="panel-head">
+                                <div>
+                                    <p class="panel-kicker">Workspace Intelligence</p>
+                                    <h2>Business snapshot</h2>
+                                </div>
+                            </div>
+                            <div class="insight-grid" id="dashboardSummary">
+                                <div class="empty-state">Sign in and work inside a saved workspace to unlock business-level analytics.</div>
+                            </div>
+                        </section>
+                    </div>
+                </section>
+
+                <section class="tab-panel" id="tab-tasks">
+                    <div class="board-grid">
+                        <section class="panel task-column">
+                            <div class="panel-head">
+                                <div>
+                                    <p class="panel-kicker">Queued</p>
+                                    <h2>Ready to run</h2>
+                                </div>
+                            </div>
+                            <div class="task-list" id="taskQueued">
+                                <div class="empty-state">No queued tasks yet.</div>
+                            </div>
+                        </section>
+                        <section class="panel task-column">
+                            <div class="panel-head">
+                                <div>
+                                    <p class="panel-kicker">In Progress</p>
+                                    <h2>Active work</h2>
+                                </div>
+                            </div>
+                            <div class="task-list" id="taskInProgress">
+                                <div class="empty-state">Nothing in progress.</div>
+                            </div>
+                        </section>
+                        <section class="panel task-column">
+                            <div class="panel-head">
+                                <div>
+                                    <p class="panel-kicker">Completed</p>
+                                    <h2>Closed loops</h2>
+                                </div>
+                            </div>
+                            <div class="task-list" id="taskCompleted">
+                                <div class="empty-state">No completed tasks yet.</div>
+                            </div>
+                        </section>
+                    </div>
+                </section>
+
+                <section class="tab-panel" id="tab-history">
+                    <div class="history-grid">
+                        <section class="panel">
+                            <div class="panel-head">
+                                <div>
+                                    <p class="panel-kicker">Audit Trail</p>
+                                    <h2>Workspace timeline</h2>
+                                </div>
+                            </div>
+                            <div class="timeline" id="auditList">
+                                <div class="empty-state">No workspace audit events yet.</div>
+                            </div>
+                        </section>
+                        <section class="panel">
+                            <div class="panel-head">
+                                <div>
+                                    <p class="panel-kicker">Conversation Memory</p>
+                                    <h2>Recent context</h2>
+                                </div>
+                            </div>
+                            <div class="timeline" id="historyList">
+                                <div class="empty-state">No saved context yet.</div>
+                            </div>
+                        </section>
+                    </div>
+                </section>
+            </main>
+        </div>
+    </div>
+
+    <script src="/static/app.js"></script>
+</body>
+</html>

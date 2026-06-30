@@ -1,0 +1,31 @@
+steps:
+  - name: 'gcr.io/cloud-builders/docker'
+    args:
+      - 'build'
+      - '-t'
+      - 'asia-south2-docker.pkg.dev/parth123-415808/dropship-agent/dropship-agent:latest'
+      - '.'
+
+  - name: 'gcr.io/cloud-builders/docker'
+    args:
+      - 'push'
+      - 'asia-south2-docker.pkg.dev/parth123-415808/dropship-agent/dropship-agent:latest'
+
+  - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
+    entrypoint: gcloud
+    args:
+      - 'run'
+      - 'deploy'
+      - 'dropship-agent'
+      - '--image=asia-south2-docker.pkg.dev/parth123-415808/dropship-agent/dropship-agent:latest'
+      - '--region=asia-south2'
+      - '--platform=managed'
+      - '--allow-unauthenticated'
+      - '--env-vars-file=env.yaml'
+      - '--memory=1Gi'
+      - '--cpu=1'
+      - '--min-instances=0'
+      - '--max-instances=3'
+
+images:
+  - 'asia-south2-docker.pkg.dev/parth123-415808/dropship-agent/dropship-agent:latest'
